@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TrackEve - Smart Bus Tracking for Kids</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link 
+    href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" 
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* System UI Font Stack */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth; /* Enable smooth scrolling sitewide */
+    }
+
+    body {
+      background: #f8f8f8;
+      color: #111;
+      padding-top: 70px;
+      line-height: 1.6;
+      overflow-x: hidden; /* Prevent horizontal scroll */
+    }
+
+    /* Apple-style Header */
+    header {
+      height: 70px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.86);
+      backdrop-filter: saturate(200%) blur(24px);
+      -webkit-backdrop-filter: saturate(200%) blur(24px);
+      border-bottom: 0.5px solid rgba(0, 0, 0, 0.12);
+      z-index: 1000;
+    }
+
+    header h1 {
+      font-family: "Orbitron", sans-serif;
+      font-size: 1.6rem;
+      color: #1a1a1a;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    header a {
+      color: #000;
+      text-decoration: none;
+      font-weight: 500;
+      background: rgba(0, 0, 0, 0.05);
+      padding: 12px 18px;
+      border-radius: 50px;
+      font-size: 0.95rem;
+      transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+      border: 0.5px solid rgba(0, 0, 0, 0.08);
+    }
+
+    header a:active {
+      transform: scale(0.96);
+      background: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Loading Animation */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 2000;
+      transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+    }
+
+    .loading-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loader {
+      width: 80px;
+      height: 80px;
+      position: relative;
+    }
+
+    .loader-circle {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 6px solid transparent;
+      border-top-color: #0066ff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loader-circle:nth-child(2) {
+      border-top-color: transparent;
+      border-right-color: #00ccff;
+      animation-duration: 1.3s;
+    }
+
+    .loader-logo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: "Orbitron", sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #1a1a1a;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Hero Section with Parallax */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 40px 20px;
+      margin: 20px 15px;
+      border-radius: 18px;
+      background: white;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
+      border: 0.5px solid rgba(0, 0, 0, 0.04);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .parallax-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      opacity: 0.1;
+      background-image: url('images/bus_tracking_hero.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Enhanced typography for headings - more pronounced typography scale */
+    h2,
+    h3,
+    footer h4 {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      font-weight: 800; /* Stronger bold */
+      letter-spacing: 0.5px;
+      color: #000;
+    }
+
+    /* Hero heading */
+    .hero h2 {
+      font-size: 2.2rem; /* Larger font size */
+      margin-bottom: 20px;
+      line-height: 1.3;
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero h2::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px; /* Slightly wider */
+      height: 4px;
+      background: linear-gradient(90deg, #0066ff 0%, #00ccff 100%);
+      border-radius: 4px;
+    }
+
+    /* Other section headings */
+    h3 {
+      font-size: 1.8rem; /* Larger font size */
+      margin-bottom: 15px;
+      color: #111; /* Darker for better contrast */
+    }
+
+    /* Paragraph styles - increased contrast */
+    p {
+      font-size: 1rem;
+      color: #222; /* Darker for better contrast */
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    /* Slideshow Container */
+    .slideshow-container {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+      height: 450px; /* Fixed height for slideshow */
+      margin: 30px 0;
+    }
+
+    /* Slides */
+    .slides {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .slide {
+      min-width: 80%; /* Card takes 80% of screen width */
+      height: 100%; /* Ensure slides take full container height */
+      padding: 25px 20px;
+      margin: 0 5%; /* 5% margin on each side */
+      border-radius: 18px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
+      border: 0.5px solid rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: opacity 0.5s ease, transform 0.3s ease;
+      box-sizing: border-box; /* Ensure padding is included in height */
+    }
+
+    /* Gradient backgrounds for each slide */
+    #slide1 {
+      background: linear-gradient(135deg, #ffffff 0%, #e6f2ff 100%);
+      border-bottom: 4px solid #0066ff;
+    }
+
+    #slide2 {
+      background: linear-gradient(135deg, #ffffff 0%, #fff0e6 100%);
+      border-bottom: 4px solid #ff6600;
+    }
+
+    #slide3 {
+      background: linear-gradient(135deg, #ffffff 0%, #e8f8e8 100%);
+      border-bottom: 4px solid #00cc66;
+    }
+
+    #slide4 {
+      background: linear-gradient(135deg, #ffffff 0%, #f2e6ff 100%);
+      border-bottom: 4px solid #9933ff;
+    }
+
+    /* Images */
+    .feature-img {
+      width: 100%;
+      max-width: 250px;
+      height: 200px; /* Fixed height for consistent image size */
+      object-fit: cover; /* Scale image to cover the area, maintaining aspect ratio */
+      border-radius: 14px;
+      margin: 20px auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      border: 0.5px solid rgba(0, 0, 0, 0.04);
+      transition: transform 0.3s ease; /* For micro-interactions */
+    }
+
+    .feature-img:active {
+      transform: scale(0.98); /* Micro-interaction when tapped */
+    }
+
+    /* Slideshow Navigation */
+    .slideshow-nav {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 0;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+    .nav-dot.active {
+      background: #0066ff;
+      transform: scale(1.3);
+    }
+
+    /* Floating CTA */
+    .floating-cta {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #0066ff 0%, #00ccff 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 102, 255, 0.3);
+      z-index: 50;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.08);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      margin: 20px 15px;
+      padding: 25px 20px;
+      border-radius: 18px;
+      background: white;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
+      border: 0.5px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .faq-section h3 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .accordion {
+      margin-bottom: 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #f9f9f9;
+      border: 0.5px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .accordion-header {
+      background: #f9f9f9;
+      padding: 15px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s ease;
+    }
+
+    .accordion-header:active {
+      background: #f0f0f0;
+    }
+
+    .accordion-header h4 {
+      font-weight: 600;
+      color: #222;
+      font-size: 1.05rem;
+      margin: 0;
+    }
+
+    .accordion-icon {
+      width: 20px;
+      height: 20px;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .accordion-icon::before,
+    .accordion-icon::after {
+      content: '';
+      position: absolute;
+      background: #555;
+      border-radius: 2px;
+    }
+
+    .accordion-icon::before {
+      width: 2px;
+      height: 20px;
+      top: 0;
+      left: 9px;
+      transition: height 0.3s ease;
+    }
+
+    .accordion-icon::after {
+      width: 20px;
+      height: 2px;
+      top: 9px;
+      left: 0;
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      padding: 0 20px;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      border-top: 0px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .accordion.active .accordion-content {
+      max-height: 300px;
+      padding: 15px 20px;
+      border-top: 0.5px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .accordion.active .accordion-icon::before {
+      height: 0;
+    }
+
+    /* Footer */
+    footer {
+      padding: 40px 20px 80px;
+      background: #f8f8f8;
+      text-align: center;
+      border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+    }
+
+    footer h4 {
+      font-size: 1.8rem; /* Consistent with h3 */
+      margin-bottom: 15px;
+    }
+
+    .cta-button {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #0066ff 0%, #00ccff 100%);
+      color: white;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700; /* Bold for button text */
+      box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cta-button:active {
+      transform: scale(0.96);
+      box-shadow: 0 2px 8px rgba(0, 102, 255, 0.2);
+    }
+
+    /* Slide Animation Classes */
+    .slide-active {
+      opacity: 1;
+      transform: scale(1);
+      z-index: 2;
+    }
+
+    .slide-prev, .slide-next {
+      opacity: 0.4;
+      transform: scale(0.9);
+      z-index: 1;
+    }
+
+    .slide-hidden {
+      opacity: 0;
+      transform: scale(0.8);
+      z-index: 0;
+    }
+
+    /* Preview Indicators */
+    .preview-indicator {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
+
+    .preview-left {
+      left: 10px;
+    }
+
+    .preview-right {
+      right: 10px;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 400px) {
+      header h1 {
+        font-size: 1.3rem;
+      }
+
+      header a {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+      }
+
+      .hero h2 {
+        font-size: 1.9rem;
+      }
+      
+      .slideshow-container {
+        height: 420px;
+      }
+      
+      .slide {
+        min-width: 85%;
+        margin: 0 3%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Animation -->
+  <div class="loading-overlay">
+    <div class="loader">
+      <div class="loader-circle"></div>
+      <div class="loader-circle"></div>
+      <div class="loader-logo">TrackEve</div>
+    </div>
+  </div>
+
+  <header>
+    <h1>TrackEve</h1>
+    <a href="#contact">Get in Touch</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="parallax-bg"></div>
+      <div class="hero-content">
+        <h2>Track Your Child's School Journey</h2>
+        <p>
+          Live CCTV Feed • Real-Time Bus Tracking • Speed Alerts • Arrival
+          Notifications
+        </p>
+        <img
+          src="images/bus_tracking_hero.jpg"
+          alt="Parent tracking bus on phone"
+          class="feature-img"
+        />
+      </div>
+    </section>
+
+    <!-- Slideshow Container -->
+    <div class="slideshow-container">
+      <div class="slides">
+        <div class="slide" id="slide1">
+          <h3>Live CCTV Feed</h3>
+          <p>Always know what's happening inside the bus in real-time with live camera access.</p>
+          <img src="images/cctv_feed.jpg" alt="Live CCTV inside bus" class="feature-img" />
+        </div>
+        
+        <div class="slide" id="slide2">
+          <h3>Bus Attendance Tracking</h3>
+          <p>Get instant alerts when your child boards or leaves the bus.</p>
+          <img
+            src="images/attendance_tracking.jpg"
+            alt="Child bus attendance UI"
+            class="feature-img"
+          />
+        </div>
+        
+        <div class="slide" id="slide3">
+          <h3>Smart Notifications</h3>
+          <p>Receive real-time notifications like "Bus arriving in 5 minutes" for pickup and drop.</p>
+          <img src="images/notification.jpg" alt="Arrival notification screenshot" class="feature-img" />
+        </div>
+        
+        <div class="slide" id="slide4">
+          <h3>Live Location + Speedometer</h3>
+          <p>See the bus location and current speed, right on your phone.</p>
+          <img src="images/location_speed.jpg" alt="Bus location map with speed" class="feature-img" />
+        </div>
+      </div>
+      
+      <!-- Navigation Dots -->
+      <div class="slideshow-nav">
+        <div class="nav-dot active" data-slide="0"></div>
+        <div class="nav-dot" data-slide="1"></div>
+        <div class="nav-dot" data-slide="2"></div>
+        <div class="nav-dot" data-slide="3"></div>
+      </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h3>Frequently Asked Questions</h3>
+      
+      <div class="accordion">
+        <div class="accordion-header">
+          <h4>How secure is the CCTV feed?</h4>
+          <div class="accordion-icon"></div>
+        </div>
+        <div class="accordion-content">
+          <p>Your child's privacy is our top priority. The CCTV feed is encrypted end-to-end and only accessible to authorized parents and school administrators. We use bank-level security protocols to ensure all data remains private and secure.</p>
+        </div>
+      </div>
+      
+      <div class="accordion">
+        <div class="accordion-header">
+          <h4>What happens if I lose internet connection?</h4>
+          <div class="accordion-icon"></div>
+        </div>
+        <div class="accordion-content">
+          <p>TrackEve will store essential notifications and updates locally on your device. Once your connection is restored, you'll receive all missed alerts and the tracking will resume automatically without any action required.</p>
+        </div>
+      </div>
+      
+      <div class="accordion">
+        <div class="accordion-header">
+          <h4>How accurate is the bus location tracking?</h4>
+          <div class="accordion-icon"></div>
+        </div>
+        <div class="accordion-content">
+          <p>TrackEve uses advanced GPS technology that provides location accuracy within 3-5 meters. The app updates the bus location every 10 seconds when in motion, giving you near real-time information about your child's journey.</p>
+        </div>
+      </div>
+      
+      <div class="accordion">
+        <div class="accordion-header">
+          <h4>Can I share access with other family members?</h4>
+          <div class="accordion-icon"></div>
+        </div>
+        <div class="accordion-content">
+          <p>Yes! You can add up to 5 family members who can also receive notifications and access the tracking features. Each family member will need to download the app and verify their identity through your primary account.</p>
+        </div>
+      </div>
+      
+      <div class="accordion">
+        <div class="accordion-header">
+          <h4>Is TrackEve compatible with all school bus systems?</h4>
+          <div class="accordion-icon"></div>
+        </div>
+        <div class="accordion-content">
+          <p>TrackEve works with most modern school transportation systems. Our team will coordinate with your school to ensure compatibility and proper installation of necessary tracking hardware if it's not already present.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="contact">
+    <h4>Contact Us</h4>
+    <p>Have questions or want to know more about TrackEve?</p>
+    <a href="mailto:contact@trackeve.com" class="cta-button">Email Us</a>
+  </footer>
+
+  <a href="#contact" class="floating-cta">
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M4 4H20V20H4V4Z" stroke="white" stroke-width="2" />
+      <path d="M4 4L12 12L20 4" stroke=" Translate to Kannada: white" stroke-width="2" />
+    </svg>
+  </a>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Loading Animation
+      const loadingOverlay = document.querySelector('.loading-overlay');
+      
+      // Hide loading animation after everything is loaded
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          loadingOverlay.classList.add('hidden');
+        }, 1000); // Show loader for at least 1 second
+      });
+      
+      // Parallax Effect for Hero
+      const parallaxBg = document.querySelector('.parallax-bg');
+      window.addEventListener('scroll', function() {
+        let offset = window.pageYOffset;
+        parallaxBg.style.transform = 'translateY(' + offset * 0.2 + 'px)';
+      });
+      
+      // Slideshow elements
+      const slidesContainer = document.querySelector('.slides');
+      const slides = document.querySelectorAll('.slide');
+      const dots = document.querySelectorAll('.nav-dot');
+      
+      // Initial variables
+      let currentSlide = 0;
+      let slideWidth = slides[0].clientWidth;
+      let slideMargin = slideWidth * 0.05; // Calculate margin based on slide width (5%)
+      let touchStartX = 0;
+      let touchEndX = 0;
+      let isDragging = false;
+      let startTranslate = 0;
+      let autoplayInterval;
+      
+      // Update slide width on resize
+      window.addEventListener('resize', () => {
+        slideWidth = slides[0].clientWidth;
+        slideMargin = slideWidth * 0.05;
+        goToSlide(currentSlide, false);
+      });
+      
+      // Initialize the slideshow
+      function initSlideshow() {
+        // Set initial positions and classes
+        for (let i = 0; i < slides.length; i++) {
+          if (i === currentSlide) {
+            slides[i].classList.add('slide-active');
+          } else if (i === currentSlide + 1 || (currentSlide === slides.length - 1 && i === 0)) {
+            slides[i].classList.add('slide-next');
+          } else if (i === currentSlide - 1 || (currentSlide === 0 && i === slides.length - 1)) {
+            slides[i].classList.add('slide-prev');
+          } else {
+            slides[i].classList.add('slide-hidden');
+          }
+        }
+        
+        // Start autoplay
+        startAutoplay();
+      }
+      
+      // Go to specific slide
+      function goToSlide(index, animate = true) {
+        if (index < 0) index = slides.length - 1;
+        if (index >= slides.length) index = 0;
+        
+        // Calculate the offset to center the active slide
+        const totalSlideWidth = slideWidth + slideMargin * 2; // Width including margins
+        const offset = -(index * totalSlideWidth) + (window.innerWidth - slideWidth) / 2;
+        
+        // Apply the transform with or without animation
+        if (animate) {
+          slidesContainer.style.transition = 'transform 0.5s ease-in-out';
+        } else {
+          slidesContainer.style.transition = 'none';
+        }
+        
+        slidesContainer.style.transform = `translateX(${offset}px)`;
+        
+        // Update slide classes
+        slides.forEach((slide, i) => {
+          slide.classList.remove('slide-active', 'slide-prev', 'slide-next', 'slide-hidden');
+          
+          if (i === index) {
+            slide.classList.add('slide-active');
+          } else if (i === (index + 1) % slides.length) {
+            slide.classList.add('slide-next');
+          } else if (i === (index - 1 + slides.length) % slides.length) {
+            slide.classList.add('slide-prev');
+          } else {
+            slide.classList.add('slide-hidden');
+          }
+        });
+        
+        // Update active dot
+        dots.forEach((dot, i) => {
+          dot.classList.toggle('active', i === index);
+        });
+        
+        // Update current slide index
+        currentSlide = index;
+        
+        // Restart autoplay
+        resetAutoplay();
+      }
+      
+      // Next slide
+      function nextSlide() {
+        goToSlide(currentSlide + 1);
+      }
+      
+      // Previous slide
+      function prevSlide() {
+        goToSlide(currentSlide - 1);
+      }
+      
+      // Start autoplay
+      function startAutoplay() {
+        autoplayInterval = setInterval(nextSlide, 4000); // Change slide every 4 seconds
+      }
+      
+      // Reset autoplay
+      function resetAutoplay() {
+        clearInterval(autoplayInterval);
+        startAutoplay();
+      }
+      
+      // Touch handlers for swiping
+      slidesContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+        startTranslate = getTranslateX(slidesContainer);
+        isDragging = true;
+        
+        // Stop animation during drag
+        slidesContainer.style.transition = 'none';
+        
+        // Pause autoplay during interaction
+        clearInterval(autoplayInterval);
+      });
+      
+      slidesContainer.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        
+        touchEndX = e.touches[0].clientX;
+        const diffX = touchEndX - touchStartX;
+        
+        // Move slides container with finger
+        slidesContainer.style.transform = `translateX(${startTranslate + diffX}px)`;
+      });
+      
+      slidesContainer.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        // Restore transition
+        slidesContainer.style.transition = 'transform 0.5s ease-in-out';
+        
+        touchEndX = e.changedTouches[0].clientX;
+        const diffX = touchEndX - touchStartX;
+        
+        // Determine if swipe was significant enough to change slide
+        if (Math.abs(diffX) > slideWidth * 0.2) {
+          if (diffX > 0) {
+            prevSlide();
+          } else {
+            nextSlide();
+          }
+        } else {
+          // Return to current slide if swipe wasn't far enough
+          goToSlide(currentSlide);
+        }
+        
+        // Restart autoplay
+        startAutoplay();
+      });
+      
+      // Helper function to get current translateX value
+      function getTranslateX(element) {
+        const style = window.getComputedStyle(element);
+        const matrix = new WebKitCSSMatrix(style.transform);
+        return matrix.m41;
+      }
+      
+      // Click event for navigation dots
+      dots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+          goToSlide(index);
+        });
+      });
+      
+      // FAQ Accordion functionality
+      const accordions = document.querySelectorAll('.accordion');
+      
+      accordions.forEach(accordion => {
+        const header = accordion.querySelector('.accordion-header');
+        header.addEventListener('click', () => {
+          // Toggle active class
+          accordion.classList.toggle('active');
+          
+          // Close other accordions when opening a new one
+          accordions.forEach(otherAccordion => {
+            if (otherAccordion !== accordion && otherAccordion.classList.contains('active')) {
+              otherAccordion.classList.remove('active');
+            }
+          });
+        });
+      });
+      
+      // Initialize slideshow
+      initSlideshow();
+    });
+  </script>
+</body>
+</html>
